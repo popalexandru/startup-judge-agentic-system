@@ -6,8 +6,6 @@ from app.state import StartupState
 
 def market_agent(state: StartupState) -> dict[str, str]:
     """Return a partial update without mutating the input state."""
-    print("[MARKET AGENT] started")
-
     idea = state["idea"]
     if not isinstance(idea, str) or not idea.strip():
         raise ValueError("The startup idea must be a non-empty string.")
@@ -35,6 +33,4 @@ def market_agent(state: StartupState) -> dict[str, str]:
         raise ValueError("Market Agent received an empty response.")
 
     update = {"market_analysis": analysis}
-    print("[MARKET AGENT] produced: market_analysis")
-    print("[MARKET AGENT] completed")
     return update

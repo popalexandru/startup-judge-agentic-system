@@ -19,8 +19,6 @@ class JudgeOutput(BaseModel):
 
 def judge_agent(state: StartupState) -> dict[str, int | str]:
     """Receive all analyses and return the three final fields."""
-    print("[JUDGE AGENT] started")
-
     idea = state["idea"]
     market = state["market_analysis"]
     risks = state["risk_analysis"]
@@ -47,6 +45,4 @@ def judge_agent(state: StartupState) -> dict[str, int | str]:
     result = structured_llm.invoke(messages)
     update = result.model_dump()
 
-    print("[JUDGE AGENT] produced: final_score, verdict, recommendation")
-    print("[JUDGE AGENT] completed")
     return update

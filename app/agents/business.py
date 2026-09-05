@@ -6,8 +6,6 @@ from app.state import StartupState
 
 def business_agent(state: StartupState) -> dict[str, str]:
     """Read the idea, market, and risks; return only business_analysis."""
-    print("[BUSINESS AGENT] started")
-
     idea = state["idea"]
     market = state["market_analysis"]
     risks = state["risk_analysis"]
@@ -27,6 +25,4 @@ def business_agent(state: StartupState) -> dict[str, str]:
         raise ValueError("Business Agent received an empty response.")
 
     update = {"business_analysis": analysis}
-    print("[BUSINESS AGENT] produced: business_analysis")
-    print("[BUSINESS AGENT] completed")
     return update

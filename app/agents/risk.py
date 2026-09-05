@@ -6,8 +6,6 @@ from app.state import StartupState
 
 def risk_agent(state: StartupState) -> dict[str, str]:
     """Require Market to have already produced market_analysis."""
-    print("[RISK AGENT] started")
-
     idea = state["idea"]
     market_analysis = state["market_analysis"]
     if not isinstance(idea, str) or not idea.strip():
@@ -39,6 +37,4 @@ def risk_agent(state: StartupState) -> dict[str, str]:
         raise ValueError("Risk Agent received an empty response.")
 
     update = {"risk_analysis": analysis}
-    print("[RISK AGENT] produced: risk_analysis")
-    print("[RISK AGENT] completed")
     return update
