@@ -1,0 +1,6 @@
+# NotRequired for Python 3.10; available from typing in Python 3.11.
+typing_extensions>=4.0,<5
+langchain-openai>=1.0,<2
+python-dotenv>=1.0,<2
+langgraph>=1.0,<2
+pydantic>=2.7.4,<3
