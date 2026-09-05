@@ -2,7 +2,7 @@
 
 Startup Judge Agentic System is the advanced version of the Startup Judge portfolio project.
 
-It starts from a clean LangGraph V1 workflow and will evolve into a more realistic agentic system with streaming progress, conditional routing, bounded research loops, tool use, and eventually an API or product interface.
+It starts from a clean LangGraph V1 workflow and evolves into a more realistic agentic system with streaming progress, conditional routing, bounded research loops, tool use, and eventually an API or product interface.
 
 ```text
 START -> Market -> Risk -> Business -> Judge -> END
@@ -16,14 +16,13 @@ The current implementation is the V1 sequential graph:
 - four focused LangGraph nodes
 - partial state updates between agents
 - structured Judge output with Pydantic
-- CLI execution
+- streamed CLI execution with `graph.stream(...)`
 - mocked LLM tests
 
 This baseline is intentionally simple so each advanced capability can be added and understood one step at a time.
 
 ## Planned Evolution
 
-- stream graph updates as each node completes
 - add conditional routing based on Judge uncertainty
 - run a bounded improvement loop with a maximum number of iterations
 - add a web research tool for evidence-aware analysis
@@ -62,13 +61,22 @@ OPENAI_MODEL=gpt-4.1-mini
 python -m app.main "AI assistant for barbershop scheduling"
 ```
 
+During execution, the CLI prints each streamed graph update:
+
+```text
+[STREAM] market -> market_analysis
+[STREAM] risk -> risk_analysis
+[STREAM] business -> business_analysis
+[STREAM] judge -> final_score, verdict, recommendation
+```
+
 ## Tests
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-The tests mock LLM calls and verify state updates, graph order, error propagation, and structured Judge validation.
+The tests mock LLM calls and verify state updates, graph order, streamed update accumulation, error propagation, and structured Judge validation.
 
 ## Related Repository
 
