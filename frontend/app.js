@@ -12,6 +12,8 @@ const sourcesList = document.querySelector("#sources-list");
 const pipelineSteps = [...document.querySelectorAll("[data-step]")];
 const agentOutputTitle = document.querySelector("#agent-output-title");
 const agentOutputBody = document.querySelector("#agent-output-body");
+const agentDialog = document.querySelector("#agent-dialog");
+const dialogClose = document.querySelector("#dialog-close");
 const stepDelayMs = 900;
 let progressTimer = null;
 let currentAgentOutputs = {};
@@ -63,6 +65,7 @@ function selectAgentOutput(stepName) {
   agentOutputTitle.textContent = stepName[0].toUpperCase() + stepName.slice(1);
   agentOutputBody.textContent =
     currentAgentOutputs[stepName] || "No output captured for this agent.";
+  agentDialog.showModal();
 }
 
 function setVerdict(value) {
@@ -108,7 +111,6 @@ function renderResult(data) {
   setVerdict(data.verdict);
   recommendation.textContent = data.recommendation;
   renderSources(data.research_sources || []);
-  selectAgentOutput("market");
 }
 
 pipelineSteps.forEach((step) => {
@@ -118,6 +120,16 @@ pipelineSteps.forEach((step) => {
     }
     selectAgentOutput(step.dataset.step);
   });
+});
+
+dialogClose.addEventListener("click", () => {
+  agentDialog.close();
+});
+
+agentDialog.addEventListener("click", (event) => {
+  if (event.target === agentDialog) {
+    agentDialog.close();
+  }
 });
 
 form.addEventListener("submit", async (event) => {

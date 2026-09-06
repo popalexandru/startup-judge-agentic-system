@@ -15,7 +15,7 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Startup Judge", response.text)
         self.assertIn('data-step="market"', response.text)
-        self.assertIn("Agent output", response.text)
+        self.assertIn('id="agent-dialog"', response.text)
 
     def test_static_assets_are_served(self):
         response = client.get("/static/app.js")

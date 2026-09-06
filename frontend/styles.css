@@ -105,7 +105,7 @@ label {
 
 textarea {
   width: 100%;
-  min-height: 220px;
+  min-height: 150px;
   resize: vertical;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -122,7 +122,7 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(36, 211, 238, 0.18);
 }
 
-button {
+.primary-action {
   width: fit-content;
   min-height: 44px;
   border: 0;
@@ -135,7 +135,7 @@ button {
   cursor: pointer;
 }
 
-button:disabled {
+.primary-action:disabled {
   cursor: wait;
   opacity: 0.62;
 }
@@ -159,6 +159,9 @@ button:disabled {
 }
 
 .pipeline button {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
   position: relative;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -169,6 +172,7 @@ button:disabled {
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
+  font-family: inherit;
   transition:
     border-color 180ms ease,
     color 180ms ease,
@@ -260,30 +264,6 @@ button:disabled {
   line-height: 1.65;
 }
 
-.agent-output {
-  margin-top: 1.5rem;
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
-}
-
-.agent-output h3 {
-  margin: 0 0 0.7rem;
-  font-size: 1rem;
-}
-
-.agent-output pre {
-  max-height: 260px;
-  overflow: auto;
-  white-space: pre-wrap;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #0b111a;
-  color: var(--text);
-  padding: 0.9rem;
-  font: inherit;
-  line-height: 1.55;
-}
-
 .sources ul {
   display: grid;
   gap: 0.85rem;
@@ -315,6 +295,61 @@ button:disabled {
 
 .hidden {
   display: none;
+}
+
+.agent-dialog {
+  width: min(760px, calc(100vw - 2rem));
+  max-height: min(720px, calc(100vh - 2rem));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 1.1rem;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.55);
+}
+
+.agent-dialog::backdrop {
+  background: rgba(2, 5, 10, 0.72);
+}
+
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-strong);
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.agent-dialog pre {
+  max-height: 540px;
+  overflow: auto;
+  white-space: pre-wrap;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0b111a;
+  color: var(--text);
+  padding: 0.95rem;
+  font: inherit;
+  line-height: 1.55;
 }
 
 @keyframes spin {
