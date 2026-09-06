@@ -26,6 +26,7 @@ The current implementation is the V1 sequential graph:
 - deterministic verdict mapping from score
 - streamed CLI execution with `graph.stream(...)`
 - colored terminal output with Rich
+- FastAPI backend with `POST /evaluate`
 - conditional routing after Judge
 - bounded improvement loop with a maximum of 3 iterations
 - mocked LLM tests
@@ -34,7 +35,6 @@ This baseline is intentionally simple so each advanced capability can be added a
 
 ## Planned Evolution
 
-- expose the workflow through an API
 - add a lightweight frontend for portfolio demos
 - persist evaluations and previous runs
 
@@ -77,6 +77,8 @@ TAVILY_API_KEY=your_tavily_api_key_here
 
 ## Run
 
+CLI:
+
 ```bash
 python -m app.main "AI assistant for barbershop scheduling"
 ```
@@ -103,13 +105,34 @@ If Judge returns `NO-GO` and the loop still has attempts left, the CLI shows the
 [STREAM] improve -> idea, improvement_notes, iteration
 ```
 
+API:
+
+```bash
+python -m uvicorn app.api:app --reload
+```
+
+Then call:
+
+```bash
+curl -X POST http://127.0.0.1:8000/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{"idea":"AI assistant for barbershop scheduling"}'
+```
+
+The API also exposes:
+
+```text
+GET /health
+POST /evaluate
+```
+
 ## Tests
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-The tests mock LLM calls and verify state updates, graph order, streamed update accumulation, conditional routing, bounded loops, error propagation, and structured Judge validation.
+The tests mock LLM calls and verify state updates, graph order, streamed update accumulation, API responses, conditional routing, bounded loops, error propagation, and structured Judge validation.
 
 ## Related Repository
 

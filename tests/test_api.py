@@ -1,0 +1,66 @@
+import unittest
+from unittest.mock import patch
+
+from fastapi.testclient import TestClient
+
+from app.api import app
+
+client = TestClient(app)
+
+
+class ApiTests(unittest.TestCase):
+    def test_health(self):
+        response = client.get("/health")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "ok"})
+
+    @patch("app.api.graph")
+    def test_evaluate_returns_public_response(self, graph):
+        graph.invoke.return_value = {
+            "idea": "Barbershop scheduling assistant",
+            "final_score": 72,
+            "verdict": "GO",
+            "recommendation": "Run a pilot.",
+            "iteration": 1,
+            "research_sources": [
+                {
+                    "title": "Booking software market",
+                    "url": "https://example.com",
+                    "summary": "Market context.",
+                }
+            ],
+        }
+
+        response = client.post("/evaluate", json={"idea": "  Barbershop scheduling assistant  "})
+
+        self.assertEqual(response.status_code, 200)
+        graph.invoke.assert_called_once_with({"idea": "Barbershop scheduling assistant"})
+        self.assertEqual(
+            response.json(),
+            {
+                "idea": "Barbershop scheduling assistant",
+                "final_score": 72,
+                "verdict": "GO",
+                "recommendation": "Run a pilot.",
+                "iteration": 1,
+                "research_sources": [
+                    {
+                        "title": "Booking software market",
+                        "url": "https://example.com",
+                        "summary": "Market context.",
+                    }
+                ],
+            },
+        )
+
+    @patch("app.api.graph")
+    def test_blank_idea_is_rejected_before_graph_runs(self, graph):
+        response = client.post("/evaluate", json={"idea": "   "})
+
+        self.assertEqual(response.status_code, 422)
+        graph.invoke.assert_not_called()
+
+
+if __name__ == "__main__":
+    unittest.main()

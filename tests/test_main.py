@@ -28,7 +28,8 @@ class MainTests(unittest.TestCase):
             },
         ]
 
-        result = run_streamed_graph({"idea": "Scheduling assistant"})
+        with patch("app.main.console.print"):
+            result = run_streamed_graph({"idea": "Scheduling assistant"})
 
         self.assertEqual(
             result,
