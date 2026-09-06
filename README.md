@@ -1,8 +1,16 @@
 # Startup Judge Agentic System
 
-Startup Judge Agentic System is the advanced version of the Startup Judge portfolio project.
+Startup Judge is a portfolio project that shows how to build a small but realistic agentic workflow with LangGraph.
 
-It starts from a clean LangGraph V1 workflow and evolves into a more realistic agentic system with streaming progress, conditional routing, bounded research loops, tool use, an API, and a dark product-style interface.
+It takes one startup idea and runs it through a sequence of specialized agents: market framing, live web research, risk analysis, business analysis, implementation planning, and a final judge. The final verdict is deterministic: the LLM proposes a score, and the application maps that score to `GO`, `MAYBE`, or `NO-GO`.
+
+## Why this project matters
+
+This project demonstrates more than a single prompt wrapped in an API. It shows how to split a business evaluation into clear agent responsibilities, pass typed state between nodes, add tool use where it belongs, stream progress to the user, and keep final decisions predictable.
+
+The goal is to keep the system understandable while still showing production-shaped patterns: validation, routing, tests, API boundaries, and a clean demo interface.
+
+## Architecture
 
 ```text
 START -> Market -> Research -> Risk -> Business -> Implementation -> Judge
@@ -13,52 +21,43 @@ START -> Market -> Research -> Risk -> Business -> Implementation -> Judge
                                                                 Improve -> Market
 ```
 
-## Current Baseline
+If the Judge returns `NO-GO`, the graph can route to Improve and retry the evaluation with a refined idea. The loop is capped at three improvement attempts.
 
-The current implementation is the V1 sequential graph:
+## What it demonstrates
 
-- typed workflow state with `StartupState`
-- six focused LangGraph analysis nodes
-- Tavily-powered web research between Market and Risk
-- visible research sources in the final CLI output
-- practical MVP implementation planning with rough time/cost level
-- partial state updates between agents
-- structured Judge output with Pydantic
+- LangGraph `StateGraph` orchestration
+- typed shared state with `StartupState`
+- specialized agents with small responsibilities
+- Tavily web research as a real external tool
+- structured Judge output with Pydantic validation
 - deterministic verdict mapping from score
-- streamed CLI execution with `graph.stream(...)`
-- colored terminal output with Rich
+- conditional routing and bounded improvement loops
+- streamed CLI updates with Rich terminal output
 - FastAPI backend with `POST /evaluate`
-- dark themed frontend served by the FastAPI app
-- conditional routing after Judge
-- bounded improvement loop with a maximum of 3 iterations
-- mocked LLM tests
+- dark frontend interface with inspectable agent outputs
+- mocked LLM and tool tests
 
-This baseline is intentionally simple so each advanced capability can be added and understood one step at a time.
+## Agents
 
-## Planned Evolution
-
-- persist evaluations and previous runs
-
-## Workflow
-
-| Agent | Reads | Produces |
+| Agent | Role | Produces |
 | --- | --- | --- |
-| Market | `idea` | `market_analysis` |
-| Research | `idea`, `market_analysis` | `research_findings`, `research_sources` |
-| Risk | `idea`, `market_analysis`, `research_findings` | `risk_analysis` |
-| Business | `idea`, `market_analysis`, `research_findings`, `risk_analysis` | `business_analysis` |
-| Implementation | `idea`, all previous analyses | `implementation_plan` |
-| Judge | `idea`, all analyses, `implementation_plan` | `final_score`, `verdict`, `recommendation` |
-| Improve | `idea`, `recommendation`, `iteration` | `idea`, `improvement_notes`, `iteration` |
+| Market | Frames the customer, problem, alternatives, and assumptions | `market_analysis` |
+| Research | Searches the web for current context and sources | `research_findings`, `research_sources` |
+| Risk | Reviews adoption, competition, execution, platform, and privacy risks | `risk_analysis` |
+| Business | Evaluates monetization, costs, channels, and MVP assumptions | `business_analysis` |
+| Implementation | Proposes MVP scope, stack, build steps, risks, and rough cost level | `implementation_plan` |
+| Judge | Synthesizes all outputs into a score, verdict, and next step | `final_score`, `verdict`, `recommendation` |
+| Improve | Refines weak ideas when the verdict is `NO-GO` | `idea`, `improvement_notes`, `iteration` |
 
-After Judge runs, the graph routes conditionally:
+## Demo flow
 
-- scores `70-100` map to `GO`
-- scores `40-69` map to `MAYBE`
-- scores `0-39` map to `NO-GO`
-- `GO` or `MAYBE` ends the workflow
-- `NO-GO` routes to Improve while `iteration < 3`
-- after 3 improvement attempts, the workflow ends even if the verdict is still `NO-GO`
+A good demo input is:
+
+```text
+AI assistant for independent barbershops that handles booking, reminders, and no-show reduction
+```
+
+The frontend shows the pipeline as the workflow runs. After the result appears, each pipeline step can be opened to inspect that agent's output.
 
 ## Setup
 
@@ -69,10 +68,10 @@ python -m pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Add your OpenAI API key to `.env`:
+Add your keys to `.env`:
 
 ```env
-OPENAI_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
 OPENAI_MODEL=gpt-4.1-mini
 TAVILY_API_KEY=your_tavily_api_key_here
 ```
@@ -85,7 +84,34 @@ CLI:
 python -m app.main "AI assistant for barbershop scheduling"
 ```
 
-During execution, the CLI prints each streamed graph update:
+Web app:
+
+```bash
+python -m uvicorn app.api:app --reload
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8000/
+```
+
+API:
+
+```bash
+curl -X POST http://127.0.0.1:8000/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{"idea":"AI assistant for barbershop scheduling"}'
+```
+
+Available endpoints:
+
+```text
+GET /health
+POST /evaluate
+```
+
+## CLI stream example
 
 ```text
 [STREAM] market -> market_analysis
@@ -101,38 +127,11 @@ Research Sources
    https://example.com
 ```
 
-If Judge returns `NO-GO` and the loop still has attempts left, the CLI shows the retry route:
+For a `NO-GO` result with retry attempts left:
 
 ```text
 [ROUTE] NO-GO at iteration 0/3 -> improve
 [STREAM] improve -> idea, improvement_notes, iteration
-```
-
-API:
-
-```bash
-python -m uvicorn app.api:app --reload
-```
-
-Open the web interface:
-
-```text
-http://127.0.0.1:8000/
-```
-
-Or call the API directly:
-
-```bash
-curl -X POST http://127.0.0.1:8000/evaluate \
-  -H "Content-Type: application/json" \
-  -d '{"idea":"AI assistant for barbershop scheduling"}'
-```
-
-The API also exposes:
-
-```text
-GET /health
-POST /evaluate
 ```
 
 ## Tests
@@ -141,10 +140,10 @@ POST /evaluate
 python -m unittest discover -s tests -v
 ```
 
-The tests mock LLM calls and verify state updates, graph order, streamed update accumulation, API responses, implementation planning, conditional routing, bounded loops, error propagation, and structured Judge validation.
+The tests mock LLM calls and verify state updates, graph order, streamed update accumulation, API responses, implementation planning, conditional routing, bounded loops, error propagation, research source formatting, and structured Judge validation.
 
-## Related Repository
+## Related repository
 
-The simpler foundations-only version lives in:
+The simpler foundations-only version lives here:
 
 https://github.com/popalexandru/startup-judge-langgraph-basics

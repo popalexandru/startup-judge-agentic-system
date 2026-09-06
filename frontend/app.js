@@ -14,6 +14,7 @@ const agentOutputTitle = document.querySelector("#agent-output-title");
 const agentOutputBody = document.querySelector("#agent-output-body");
 const agentDialog = document.querySelector("#agent-dialog");
 const dialogClose = document.querySelector("#dialog-close");
+const exampleButtons = [...document.querySelectorAll("[data-example]")];
 const stepDelayMs = 900;
 let progressTimer = null;
 let currentAgentOutputs = {};
@@ -119,6 +120,13 @@ pipelineSteps.forEach((step) => {
       return;
     }
     selectAgentOutput(step.dataset.step);
+  });
+});
+
+exampleButtons.forEach((exampleButton) => {
+  exampleButton.addEventListener("click", () => {
+    ideaInput.value = exampleButton.dataset.example;
+    ideaInput.focus();
   });
 });
 

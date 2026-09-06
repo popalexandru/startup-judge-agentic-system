@@ -14,8 +14,10 @@ class ApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Startup Judge", response.text)
+        self.assertIn("Try an example:", response.text)
         self.assertIn('data-step="market"', response.text)
         self.assertIn('data-step="implementation"', response.text)
+        self.assertIn('data-example=', response.text)
         self.assertIn('id="agent-dialog"', response.text)
 
     def test_static_assets_are_served(self):
@@ -23,6 +25,7 @@ class ApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("fetch(\"/evaluate\"", response.text)
+        self.assertIn("exampleButtons", response.text)
 
     def test_health(self):
         response = client.get("/health")

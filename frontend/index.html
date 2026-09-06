@@ -14,7 +14,7 @@
           <h1>Startup Judge</h1>
           <p class="lede">
             Evaluate a startup idea through market analysis, web research, risk review,
-            business modeling, and a deterministic final verdict.
+            business modeling, implementation planning, and a deterministic final verdict.
           </p>
         </div>
 
@@ -27,6 +27,23 @@
             placeholder="AI assistant for independent barbershops that handles booking, reminders, and no-show reduction"
             required
           ></textarea>
+          <div class="example-row" aria-label="Example startup ideas">
+            <span>Try an example:</span>
+            <button
+              type="button"
+              class="example-chip"
+              data-example="AI assistant for independent barbershops that handles booking, reminders, and no-show reduction"
+            >
+              Barbershop AI
+            </button>
+            <button
+              type="button"
+              class="example-chip"
+              data-example="Marketplace that connects local chefs with busy families for weekly home-cooked meal subscriptions"
+            >
+              Chef marketplace
+            </button>
+          </div>
           <button id="submit-button" class="primary-action" type="submit">Evaluate idea</button>
           <p id="error-message" class="error" role="alert"></p>
         </form>
@@ -41,6 +58,7 @@
           <button type="button" data-step="implementation">Implementation</button>
           <button type="button" data-step="judge">Judge</button>
         </div>
+        <p class="pipeline-hint">After the evaluation, click any step to inspect that agent's output.</p>
 
         <div id="empty-state" class="empty-state">
           <p class="eyebrow">Ready</p>
@@ -80,7 +98,7 @@
           <p class="eyebrow">Agent output</p>
           <h3 id="agent-output-title">Market</h3>
         </div>
-        <button id="dialog-close" class="icon-button" type="button" aria-label="Close dialog">x</button>
+        <button id="dialog-close" class="icon-button" type="button" aria-label="Close dialog">×</button>
       </div>
       <pre id="agent-output-body"></pre>
     </dialog>
