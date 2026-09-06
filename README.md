@@ -80,6 +80,13 @@ During execution, the CLI prints each streamed graph update:
 [STREAM] risk -> risk_analysis
 [STREAM] business -> business_analysis
 [STREAM] judge -> final_score, verdict, recommendation
+[ROUTE] MAYBE -> end
+```
+
+If Judge returns `NO-GO` and the loop still has attempts left, the CLI shows the retry route:
+
+```text
+[ROUTE] NO-GO at iteration 0/3 -> improve
 [STREAM] improve -> idea, improvement_notes, iteration
 ```
 

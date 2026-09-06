@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from app.main import run_streamed_graph
+from app.main import print_route_after_judge, run_streamed_graph
 
 
 class MainTests(unittest.TestCase):
@@ -35,6 +35,16 @@ class MainTests(unittest.TestCase):
             },
         )
         graph.stream.assert_called_once_with({"idea": "Scheduling assistant"})
+
+    @patch("builtins.print")
+    def test_print_route_after_judge_for_terminal_verdict(self, print_mock):
+        print_route_after_judge({"idea": "Idea", "verdict": "MAYBE"})
+        print_mock.assert_called_once_with("[ROUTE] MAYBE -> end")
+
+    @patch("builtins.print")
+    def test_print_route_after_judge_for_improvement_route(self, print_mock):
+        print_route_after_judge({"idea": "Idea", "verdict": "NO-GO", "iteration": 1})
+        print_mock.assert_called_once_with("[ROUTE] NO-GO at iteration 1/3 -> improve")
 
 
 if __name__ == "__main__":
