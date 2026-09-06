@@ -21,6 +21,7 @@ class StartupState(TypedDict):
     research_sources: NotRequired[list[ResearchSource]]
     risk_analysis: NotRequired[str]
     business_analysis: NotRequired[str]
+    implementation_plan: NotRequired[str]
     improvement_notes: NotRequired[str]
     iteration: NotRequired[int]
 

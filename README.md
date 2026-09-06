@@ -2,15 +2,15 @@
 
 Startup Judge Agentic System is the advanced version of the Startup Judge portfolio project.
 
-It starts from a clean LangGraph V1 workflow and evolves into a more realistic agentic system with streaming progress, conditional routing, bounded research loops, tool use, and eventually an API or product interface.
+It starts from a clean LangGraph V1 workflow and evolves into a more realistic agentic system with streaming progress, conditional routing, bounded research loops, tool use, an API, and a dark product-style interface.
 
 ```text
-START -> Market -> Research -> Risk -> Business -> Judge
-                                                 |   |
-                                                 |   v
-                                                 |  END
-                                                 v
-                                              Improve -> Market
+START -> Market -> Research -> Risk -> Business -> Implementation -> Judge
+                                                                   |   |
+                                                                   |   v
+                                                                   |  END
+                                                                   v
+                                                                Improve -> Market
 ```
 
 ## Current Baseline
@@ -18,9 +18,10 @@ START -> Market -> Research -> Risk -> Business -> Judge
 The current implementation is the V1 sequential graph:
 
 - typed workflow state with `StartupState`
-- five focused LangGraph nodes
+- six focused LangGraph analysis nodes
 - Tavily-powered web research between Market and Risk
 - visible research sources in the final CLI output
+- practical MVP implementation planning with rough time/cost level
 - partial state updates between agents
 - structured Judge output with Pydantic
 - deterministic verdict mapping from score
@@ -36,7 +37,6 @@ This baseline is intentionally simple so each advanced capability can be added a
 
 ## Planned Evolution
 
-- add a lightweight frontend for portfolio demos
 - persist evaluations and previous runs
 
 ## Workflow
@@ -47,7 +47,8 @@ This baseline is intentionally simple so each advanced capability can be added a
 | Research | `idea`, `market_analysis` | `research_findings`, `research_sources` |
 | Risk | `idea`, `market_analysis`, `research_findings` | `risk_analysis` |
 | Business | `idea`, `market_analysis`, `research_findings`, `risk_analysis` | `business_analysis` |
-| Judge | `idea`, all analyses | `final_score`, `verdict`, `recommendation` |
+| Implementation | `idea`, all previous analyses | `implementation_plan` |
+| Judge | `idea`, all analyses, `implementation_plan` | `final_score`, `verdict`, `recommendation` |
 | Improve | `idea`, `recommendation`, `iteration` | `idea`, `improvement_notes`, `iteration` |
 
 After Judge runs, the graph routes conditionally:
@@ -91,6 +92,7 @@ During execution, the CLI prints each streamed graph update:
 [STREAM] research -> research_findings, research_sources
 [STREAM] risk -> risk_analysis
 [STREAM] business -> business_analysis
+[STREAM] implementation -> implementation_plan
 [STREAM] judge -> final_score, verdict, recommendation
 [ROUTE] MAYBE -> end
 
@@ -139,7 +141,7 @@ POST /evaluate
 python -m unittest discover -s tests -v
 ```
 
-The tests mock LLM calls and verify state updates, graph order, streamed update accumulation, API responses, conditional routing, bounded loops, error propagation, and structured Judge validation.
+The tests mock LLM calls and verify state updates, graph order, streamed update accumulation, API responses, implementation planning, conditional routing, bounded loops, error propagation, and structured Judge validation.
 
 ## Related Repository
 

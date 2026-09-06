@@ -15,6 +15,7 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Startup Judge", response.text)
         self.assertIn('data-step="market"', response.text)
+        self.assertIn('data-step="implementation"', response.text)
         self.assertIn('id="agent-dialog"', response.text)
 
     def test_static_assets_are_served(self):
@@ -37,6 +38,7 @@ class ApiTests(unittest.TestCase):
             "research_findings": "Research findings.",
             "risk_analysis": "Risk analysis.",
             "business_analysis": "Business analysis.",
+            "implementation_plan": "Implementation plan.",
             "final_score": 72,
             "verdict": "GO",
             "recommendation": "Run a pilot.",
@@ -74,6 +76,7 @@ class ApiTests(unittest.TestCase):
                     "research": "Research findings.",
                     "risk": "Risk analysis.",
                     "business": "Business analysis.",
+                    "implementation": "Implementation plan.",
                     "judge": "Run a pilot.",
                 },
             },

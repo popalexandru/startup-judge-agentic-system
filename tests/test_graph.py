@@ -10,12 +10,12 @@ class GraphTests(unittest.TestCase):
     def setUp(self):
         self.clients = {}
         self.order = []
-        for name in ("market", "risk", "business", "judge", "improve"):
+        for name in ("market", "risk", "business", "implementation", "judge", "improve"):
             patcher = patch(f"app.agents.{name}.get_llm")
             self.clients[name] = patcher.start().return_value
             self.addCleanup(patcher.stop)
         self.output = JudgeLLMOutput(final_score=65, recommendation="Test a pilot.")
-        for name in ("market", "risk", "business"):
+        for name in ("market", "risk", "business", "implementation"):
             def respond(messages, name=name):
                 self.order.append(name)
                 return AIMessage(content=f"{name} result")
@@ -41,15 +41,17 @@ class GraphTests(unittest.TestCase):
     def test_full_flow_transfers_results_in_order(self):
         initial = {"idea": "Barbershop scheduling assistant"}
         result = graph.invoke(initial)
-        self.assertEqual(self.order, ["market", "research", "risk", "business", "judge"])
+        self.assertEqual(self.order, ["market", "research", "risk", "business", "implementation", "judge"])
         self.assertEqual(initial, {"idea": "Barbershop scheduling assistant"})
         self.assertEqual(result, {**initial, "market_analysis": "market result",
             "research_findings": "- Research: research result (https://example.com)",
             "research_sources": [{"title": "Research", "url": "https://example.com", "summary": "research result"}],
             "risk_analysis": "risk result", "business_analysis": "business result",
+            "implementation_plan": "implementation result",
             "final_score": 65, "verdict": "MAYBE", "recommendation": "Test a pilot."})
         for name, required in (("risk", ["market", "research"]), ("business", ["market", "research", "risk"]),
-                               ("judge", ["market", "research", "risk", "business"])):
+                               ("implementation", ["market", "research", "risk", "business"]),
+                               ("judge", ["market", "research", "risk", "business", "implementation"])):
             client = self.clients[name]
             invoke = client.with_structured_output.return_value.invoke if name == "judge" else client.invoke
             invoke.assert_called_once()
@@ -76,6 +78,7 @@ class GraphTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "Risk failed"):
             graph.invoke({"idea": "Barbershop scheduling assistant"})
         self.clients["business"].invoke.assert_not_called()
+        self.clients["implementation"].invoke.assert_not_called()
         self.clients["judge"].with_structured_output.assert_not_called()
 
     def test_no_go_routes_to_improvement_then_retries(self):
@@ -95,8 +98,8 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(
             self.order,
             [
-                "market", "research", "risk", "business", "judge", "improve",
-                "market", "research", "risk", "business", "judge",
+                "market", "research", "risk", "business", "implementation", "judge", "improve",
+                "market", "research", "risk", "business", "implementation", "judge",
             ],
         )
         self.assertEqual(result["idea"], "Improved barbershop scheduling assistant")

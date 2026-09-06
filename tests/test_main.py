@@ -19,6 +19,7 @@ class MainTests(unittest.TestCase):
             },
             {"risk": {"risk_analysis": "risk result"}},
             {"business": {"business_analysis": "business result"}},
+            {"implementation": {"implementation_plan": "implementation result"}},
             {
                 "judge": {
                     "final_score": 70,
@@ -40,6 +41,7 @@ class MainTests(unittest.TestCase):
                 "research_sources": [{"title": "Source", "url": "https://example.com", "summary": "Summary"}],
                 "risk_analysis": "risk result",
                 "business_analysis": "business result",
+                "implementation_plan": "implementation result",
                 "final_score": 70,
                 "verdict": "MAYBE",
                 "recommendation": "Run a pilot.",

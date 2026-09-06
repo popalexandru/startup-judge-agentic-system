@@ -3,6 +3,7 @@
 from langgraph.graph import END, START, StateGraph
 
 from app.agents.business import business_agent
+from app.agents.implementation import implementation_agent
 from app.agents.improve import improve_agent
 from app.agents.judge import judge_agent
 from app.agents.market import market_agent
@@ -27,6 +28,7 @@ builder.add_node("market", market_agent)
 builder.add_node("research", research_agent)
 builder.add_node("risk", risk_agent)
 builder.add_node("business", business_agent)
+builder.add_node("implementation", implementation_agent)
 builder.add_node("judge", judge_agent)
 builder.add_node("improve", improve_agent)
 
@@ -35,7 +37,8 @@ builder.add_edge(START, "market")
 builder.add_edge("market", "research")
 builder.add_edge("research", "risk")
 builder.add_edge("risk", "business")
-builder.add_edge("business", "judge")
+builder.add_edge("business", "implementation")
+builder.add_edge("implementation", "judge")
 builder.add_conditional_edges("judge", route_after_judge, {"improve": "improve", "end": END})
 builder.add_edge("improve", "market")
 

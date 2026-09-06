@@ -40,6 +40,7 @@ class AgentOutputsResponse(BaseModel):
     research: str = ""
     risk: str = ""
     business: str = ""
+    implementation: str = ""
     judge: str = ""
 
 
@@ -80,6 +81,7 @@ def evaluate(request: EvaluationRequest) -> EvaluationResponse:
             research=final_state.get("research_findings", ""),
             risk=final_state.get("risk_analysis", ""),
             business=final_state.get("business_analysis", ""),
+            implementation=final_state.get("implementation_plan", ""),
             judge=final_state.get("recommendation", ""),
         ),
     )
