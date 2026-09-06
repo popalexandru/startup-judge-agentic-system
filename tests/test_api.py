@@ -9,6 +9,18 @@ client = TestClient(app)
 
 
 class ApiTests(unittest.TestCase):
+    def test_homepage_serves_frontend(self):
+        response = client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Startup Judge", response.text)
+
+    def test_static_assets_are_served(self):
+        response = client.get("/static/app.js")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("fetch(\"/evaluate\"", response.text)
+
     def test_health(self):
         response = client.get("/health")
 

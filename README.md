@@ -27,6 +27,7 @@ The current implementation is the V1 sequential graph:
 - streamed CLI execution with `graph.stream(...)`
 - colored terminal output with Rich
 - FastAPI backend with `POST /evaluate`
+- dark themed frontend served by the FastAPI app
 - conditional routing after Judge
 - bounded improvement loop with a maximum of 3 iterations
 - mocked LLM tests
@@ -111,7 +112,13 @@ API:
 python -m uvicorn app.api:app --reload
 ```
 
-Then call:
+Open the web interface:
+
+```text
+http://127.0.0.1:8000/
+```
+
+Or call the API directly:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/evaluate \

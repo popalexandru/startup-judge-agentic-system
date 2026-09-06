@@ -1,14 +1,20 @@
 """FastAPI entrypoint for evaluating startup ideas."""
 
+from pathlib import Path
 from typing import Literal
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
 from app.graph import graph
 from app.state import StartupState
 
+FRONTEND_DIR = Path(__file__).resolve().parents[1] / "frontend"
+
 app = FastAPI(title="Startup Judge Agentic System")
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 
 class EvaluationRequest(BaseModel):
@@ -36,6 +42,11 @@ class EvaluationResponse(BaseModel):
     recommendation: str
     iteration: int = 0
     research_sources: list[ResearchSourceResponse] = Field(default_factory=list)
+
+
+@app.get("/")
+def index() -> FileResponse:
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 @app.get("/health")

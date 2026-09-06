@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Startup Judge Agentic System</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <div class="intro">
+          <p class="eyebrow">LangGraph agentic evaluation</p>
+          <h1>Startup Judge</h1>
+          <p class="lede">
+            Evaluate a startup idea through market analysis, web research, risk review,
+            business modeling, and a deterministic final verdict.
+          </p>
+        </div>
+
+        <form id="evaluation-form" class="idea-form">
+          <label for="idea">Startup idea</label>
+          <textarea
+            id="idea"
+            name="idea"
+            rows="8"
+            placeholder="AI assistant for independent barbershops that handles booking, reminders, and no-show reduction"
+            required
+          ></textarea>
+          <button id="submit-button" type="submit">Evaluate idea</button>
+          <p id="error-message" class="error" role="alert"></p>
+        </form>
+      </section>
+
+      <section class="result-surface" aria-live="polite">
+        <div class="pipeline">
+          <span>Market</span>
+          <span>Research</span>
+          <span>Risk</span>
+          <span>Business</span>
+          <span>Judge</span>
+        </div>
+
+        <div id="empty-state" class="empty-state">
+          <p class="eyebrow">Ready</p>
+          <h2>Run an evaluation to see the verdict.</h2>
+        </div>
+
+        <div id="loading-state" class="loading-state hidden">
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Running the agent workflow...</p>
+        </div>
+
+        <div id="result-card" class="result-card hidden">
+          <div class="score-row">
+            <div>
+              <p class="eyebrow">Score</p>
+              <strong id="score">--/100</strong>
+            </div>
+            <span id="verdict" class="verdict">MAYBE</span>
+          </div>
+
+          <div class="recommendation">
+            <p class="eyebrow">Recommendation</p>
+            <p id="recommendation"></p>
+          </div>
+
+          <div class="sources">
+            <p class="eyebrow">Research sources</p>
+            <ul id="sources-list"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
