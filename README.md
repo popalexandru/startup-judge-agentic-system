@@ -22,6 +22,7 @@ The current implementation is the V1 sequential graph:
 - Tavily-powered web research between Market and Risk
 - partial state updates between agents
 - structured Judge output with Pydantic
+- deterministic verdict mapping from score
 - streamed CLI execution with `graph.stream(...)`
 - colored terminal output with Rich
 - conditional routing after Judge
@@ -49,6 +50,9 @@ This baseline is intentionally simple so each advanced capability can be added a
 
 After Judge runs, the graph routes conditionally:
 
+- scores `70-100` map to `GO`
+- scores `40-69` map to `MAYBE`
+- scores `0-39` map to `NO-GO`
 - `GO` or `MAYBE` ends the workflow
 - `NO-GO` routes to Improve while `iteration < 3`
 - after 3 improvement attempts, the workflow ends even if the verdict is still `NO-GO`

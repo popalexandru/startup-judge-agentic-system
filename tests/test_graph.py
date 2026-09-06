@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch
 from langchain_core.messages import AIMessage
-from app.agents.judge import JudgeOutput
+from app.agents.judge import JudgeLLMOutput
 from app.graph import MAX_ITERATIONS, graph, route_after_judge
 
 
@@ -14,7 +14,7 @@ class GraphTests(unittest.TestCase):
             patcher = patch(f"app.agents.{name}.get_llm")
             self.clients[name] = patcher.start().return_value
             self.addCleanup(patcher.stop)
-        self.output = JudgeOutput(final_score=65, verdict="MAYBE", recommendation="Test a pilot.")
+        self.output = JudgeLLMOutput(final_score=65, recommendation="Test a pilot.")
         for name in ("market", "risk", "business"):
             def respond(messages, name=name):
                 self.order.append(name)
@@ -46,7 +46,7 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(result, {**initial, "market_analysis": "market result",
             "research_findings": "- Research: research result (https://example.com)",
             "risk_analysis": "risk result", "business_analysis": "business result",
-            **self.output.model_dump()})
+            "final_score": 65, "verdict": "MAYBE", "recommendation": "Test a pilot."})
         for name, required in (("risk", ["market", "research"]), ("business", ["market", "research", "risk"]),
                                ("judge", ["market", "research", "risk", "business"])):
             client = self.clients[name]
@@ -79,8 +79,8 @@ class GraphTests(unittest.TestCase):
 
     def test_no_go_routes_to_improvement_then_retries(self):
         outputs = [
-            JudgeOutput(final_score=25, verdict="NO-GO", recommendation="Narrow the target segment."),
-            JudgeOutput(final_score=70, verdict="MAYBE", recommendation="Test a pilot."),
+            JudgeLLMOutput(final_score=25, recommendation="Narrow the target segment."),
+            JudgeLLMOutput(final_score=70, recommendation="Test a pilot."),
         ]
 
         def judge_response(messages):
@@ -101,10 +101,10 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(result["idea"], "Improved barbershop scheduling assistant")
         self.assertEqual(result["iteration"], 1)
         self.assertEqual(result["improvement_notes"], "Narrow the target segment.")
-        self.assertEqual(result["verdict"], "MAYBE")
+        self.assertEqual(result["verdict"], "GO")
 
     def test_no_go_stops_after_max_iterations(self):
-        self.output = JudgeOutput(final_score=20, verdict="NO-GO", recommendation="Still too broad.")
+        self.output = JudgeLLMOutput(final_score=20, recommendation="Still too broad.")
 
         result = graph.invoke({"idea": "Generic scheduling app"})
 
