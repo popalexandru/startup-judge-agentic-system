@@ -34,11 +34,11 @@
 
       <section class="result-surface" aria-live="polite">
         <div class="pipeline" aria-label="Evaluation pipeline">
-          <span data-step="market">Market</span>
-          <span data-step="research">Research</span>
-          <span data-step="risk">Risk</span>
-          <span data-step="business">Business</span>
-          <span data-step="judge">Judge</span>
+          <button type="button" data-step="market">Market</button>
+          <button type="button" data-step="research">Research</button>
+          <button type="button" data-step="risk">Risk</button>
+          <button type="button" data-step="business">Business</button>
+          <button type="button" data-step="judge">Judge</button>
         </div>
 
         <div id="empty-state" class="empty-state">
@@ -68,6 +68,12 @@
           <div class="sources">
             <p class="eyebrow">Research sources</p>
             <ul id="sources-list"></ul>
+          </div>
+
+          <div class="agent-output">
+            <p class="eyebrow">Agent output</p>
+            <h3 id="agent-output-title">Market</h3>
+            <pre id="agent-output-body"></pre>
           </div>
         </div>
       </section>

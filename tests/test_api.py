@@ -15,6 +15,7 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Startup Judge", response.text)
         self.assertIn('data-step="market"', response.text)
+        self.assertIn("Agent output", response.text)
 
     def test_static_assets_are_served(self):
         response = client.get("/static/app.js")
@@ -32,6 +33,10 @@ class ApiTests(unittest.TestCase):
     def test_evaluate_returns_public_response(self, graph):
         graph.invoke.return_value = {
             "idea": "Barbershop scheduling assistant",
+            "market_analysis": "Market analysis.",
+            "research_findings": "Research findings.",
+            "risk_analysis": "Risk analysis.",
+            "business_analysis": "Business analysis.",
             "final_score": 72,
             "verdict": "GO",
             "recommendation": "Run a pilot.",
@@ -64,6 +69,13 @@ class ApiTests(unittest.TestCase):
                         "summary": "Market context.",
                     }
                 ],
+                "agent_outputs": {
+                    "market": "Market analysis.",
+                    "research": "Research findings.",
+                    "risk": "Risk analysis.",
+                    "business": "Business analysis.",
+                    "judge": "Run a pilot.",
+                },
             },
         )
 

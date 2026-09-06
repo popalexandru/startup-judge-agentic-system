@@ -10,8 +10,11 @@ const verdict = document.querySelector("#verdict");
 const recommendation = document.querySelector("#recommendation");
 const sourcesList = document.querySelector("#sources-list");
 const pipelineSteps = [...document.querySelectorAll("[data-step]")];
+const agentOutputTitle = document.querySelector("#agent-output-title");
+const agentOutputBody = document.querySelector("#agent-output-body");
 const stepDelayMs = 900;
 let progressTimer = null;
+let currentAgentOutputs = {};
 
 function setState(state) {
   emptyState.classList.toggle("hidden", state !== "empty");
@@ -21,7 +24,7 @@ function setState(state) {
 
 function resetPipeline() {
   pipelineSteps.forEach((step) => {
-    step.classList.remove("active", "done");
+    step.classList.remove("active", "done", "selected");
   });
 }
 
@@ -50,6 +53,16 @@ function finishPipelineProgress() {
     step.classList.remove("active");
     step.classList.add("done");
   });
+}
+
+function selectAgentOutput(stepName) {
+  pipelineSteps.forEach((step) => {
+    step.classList.toggle("selected", step.dataset.step === stepName);
+  });
+
+  agentOutputTitle.textContent = stepName[0].toUpperCase() + stepName.slice(1);
+  agentOutputBody.textContent =
+    currentAgentOutputs[stepName] || "No output captured for this agent.";
 }
 
 function setVerdict(value) {
@@ -90,11 +103,22 @@ function renderSources(sources) {
 }
 
 function renderResult(data) {
+  currentAgentOutputs = data.agent_outputs || {};
   score.textContent = `${data.final_score}/100`;
   setVerdict(data.verdict);
   recommendation.textContent = data.recommendation;
   renderSources(data.research_sources || []);
+  selectAgentOutput("market");
 }
+
+pipelineSteps.forEach((step) => {
+  step.addEventListener("click", () => {
+    if (resultCard.classList.contains("hidden")) {
+      return;
+    }
+    selectAgentOutput(step.dataset.step);
+  });
+});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();

@@ -35,6 +35,14 @@ class ResearchSourceResponse(BaseModel):
     summary: str
 
 
+class AgentOutputsResponse(BaseModel):
+    market: str = ""
+    research: str = ""
+    risk: str = ""
+    business: str = ""
+    judge: str = ""
+
+
 class EvaluationResponse(BaseModel):
     idea: str
     final_score: int = Field(ge=0, le=100)
@@ -42,6 +50,7 @@ class EvaluationResponse(BaseModel):
     recommendation: str
     iteration: int = 0
     research_sources: list[ResearchSourceResponse] = Field(default_factory=list)
+    agent_outputs: AgentOutputsResponse = Field(default_factory=AgentOutputsResponse)
 
 
 @app.get("/")
@@ -66,4 +75,11 @@ def evaluate(request: EvaluationRequest) -> EvaluationResponse:
         recommendation=final_state["recommendation"],
         iteration=final_state.get("iteration", 0),
         research_sources=final_state.get("research_sources", []),
+        agent_outputs=AgentOutputsResponse(
+            market=final_state.get("market_analysis", ""),
+            research=final_state.get("research_findings", ""),
+            risk=final_state.get("risk_analysis", ""),
+            business=final_state.get("business_analysis", ""),
+            judge=final_state.get("recommendation", ""),
+        ),
     )
