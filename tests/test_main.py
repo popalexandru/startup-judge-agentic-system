@@ -36,15 +36,21 @@ class MainTests(unittest.TestCase):
         )
         graph.stream.assert_called_once_with({"idea": "Scheduling assistant"})
 
-    @patch("builtins.print")
+    @patch("app.main.console.print")
     def test_print_route_after_judge_for_terminal_verdict(self, print_mock):
         print_route_after_judge({"idea": "Idea", "verdict": "MAYBE"})
-        print_mock.assert_called_once_with("[ROUTE] MAYBE -> end")
+        print_mock.assert_called_once_with(
+            "[bold yellow][ROUTE][/bold yellow] "
+            "[green]MAYBE[/green] -> [yellow]end[/yellow]"
+        )
 
-    @patch("builtins.print")
+    @patch("app.main.console.print")
     def test_print_route_after_judge_for_improvement_route(self, print_mock):
         print_route_after_judge({"idea": "Idea", "verdict": "NO-GO", "iteration": 1})
-        print_mock.assert_called_once_with("[ROUTE] NO-GO at iteration 1/3 -> improve")
+        print_mock.assert_called_once_with(
+            "[bold yellow][ROUTE][/bold yellow] "
+            "[red]NO-GO[/red] at iteration 1/3 -> [yellow]improve[/yellow]"
+        )
 
 
 if __name__ == "__main__":

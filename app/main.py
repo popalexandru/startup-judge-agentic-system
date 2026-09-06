@@ -2,13 +2,20 @@
 
 import argparse
 
+from rich.console import Console
+
 from app.graph import MAX_ITERATIONS, graph, route_after_judge
 from app.state import StartupState
+
+console = Console()
 
 
 def print_step_update(node_name: str, update: dict) -> None:
     produced_fields = ", ".join(update)
-    print(f"[STREAM] {node_name} -> {produced_fields}")
+    console.print(
+        "[bold green][STREAM][/bold green] "
+        f"[cyan]{node_name}[/cyan] -> [white]{produced_fields}[/white]"
+    )
 
 
 def print_route_after_judge(state: StartupState) -> None:
@@ -17,9 +24,16 @@ def print_route_after_judge(state: StartupState) -> None:
     iteration = state.get("iteration", 0)
 
     if route == "improve":
-        print(f"[ROUTE] {verdict} at iteration {iteration}/{MAX_ITERATIONS} -> improve")
+        console.print(
+            "[bold yellow][ROUTE][/bold yellow] "
+            f"[red]{verdict}[/red] at iteration {iteration}/{MAX_ITERATIONS} -> "
+            "[yellow]improve[/yellow]"
+        )
     else:
-        print(f"[ROUTE] {verdict} -> end")
+        console.print(
+            "[bold yellow][ROUTE][/bold yellow] "
+            f"[green]{verdict}[/green] -> [yellow]end[/yellow]"
+        )
 
 
 def run_streamed_graph(initial_state: StartupState) -> StartupState:
@@ -41,15 +55,15 @@ def main() -> None:
         parser.error("The startup idea must be a non-empty string.")
 
     initial_state: StartupState = {"idea": args.idea}
-    print("[GRAPH] Starting analysis")
-    print(f"[GRAPH] idea: {args.idea}")
+    console.print("[bold blue][GRAPH][/bold blue] Starting analysis")
+    console.print(f"[bold blue][GRAPH][/bold blue] idea: [white]{args.idea}[/white]")
 
     final_state = run_streamed_graph(initial_state)
 
-    print("\nResult")
-    print(f"Score: {final_state['final_score']}/100")
-    print(f"Verdict: {final_state['verdict']}")
-    print(f"Recommendation: {final_state['recommendation']}")
+    console.print("\n[bold]Result[/bold]")
+    console.print(f"[bold]Score:[/bold] {final_state['final_score']}/100")
+    console.print(f"[bold]Verdict:[/bold] {final_state['verdict']}")
+    console.print(f"[bold]Recommendation:[/bold] {final_state['recommendation']}")
 
 
 if __name__ == "__main__":

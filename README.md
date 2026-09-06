@@ -22,6 +22,7 @@ The current implementation is the V1 sequential graph:
 - partial state updates between agents
 - structured Judge output with Pydantic
 - streamed CLI execution with `graph.stream(...)`
+- colored terminal output with Rich
 - conditional routing after Judge
 - bounded improvement loop with a maximum of 3 iterations
 - mocked LLM tests
