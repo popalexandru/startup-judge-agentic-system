@@ -1,16 +1,16 @@
-"""Real V1 graph with mocked LLMs: order, data transfer, and final state."""
+"""Graph behavior with mocked LLMs: order, routing, and final state."""
 import unittest
 from unittest.mock import patch
 from langchain_core.messages import AIMessage
 from app.agents.judge import JudgeOutput
-from app.graph import graph
+from app.graph import MAX_ITERATIONS, graph, route_after_judge
 
 
 class GraphTests(unittest.TestCase):
     def setUp(self):
         self.clients = {}
         self.order = []
-        for name in ("market", "risk", "business", "judge"):
+        for name in ("market", "risk", "business", "judge", "improve"):
             patcher = patch(f"app.agents.{name}.get_llm")
             self.clients[name] = patcher.start().return_value
             self.addCleanup(patcher.stop)
@@ -24,6 +24,11 @@ class GraphTests(unittest.TestCase):
             self.order.append("judge")
             return self.output
         self.clients["judge"].with_structured_output.return_value.invoke.side_effect = judge_response
+
+        def improve_response(messages):
+            self.order.append("improve")
+            return AIMessage(content="Improved barbershop scheduling assistant")
+        self.clients["improve"].invoke.side_effect = improve_response
 
     def test_full_flow_transfers_results_in_order(self):
         initial = {"idea": "Barbershop scheduling assistant"}
@@ -61,3 +66,44 @@ class GraphTests(unittest.TestCase):
             graph.invoke({"idea": "Barbershop scheduling assistant"})
         self.clients["business"].invoke.assert_not_called()
         self.clients["judge"].with_structured_output.assert_not_called()
+
+    def test_no_go_routes_to_improvement_then_retries(self):
+        outputs = [
+            JudgeOutput(final_score=25, verdict="NO-GO", recommendation="Narrow the target segment."),
+            JudgeOutput(final_score=70, verdict="MAYBE", recommendation="Test a pilot."),
+        ]
+
+        def judge_response(messages):
+            self.order.append("judge")
+            return outputs.pop(0)
+
+        self.clients["judge"].with_structured_output.return_value.invoke.side_effect = judge_response
+
+        result = graph.invoke({"idea": "Generic scheduling app"})
+
+        self.assertEqual(
+            self.order,
+            ["market", "risk", "business", "judge", "improve", "market", "risk", "business", "judge"],
+        )
+        self.assertEqual(result["idea"], "Improved barbershop scheduling assistant")
+        self.assertEqual(result["iteration"], 1)
+        self.assertEqual(result["improvement_notes"], "Narrow the target segment.")
+        self.assertEqual(result["verdict"], "MAYBE")
+
+    def test_no_go_stops_after_max_iterations(self):
+        self.output = JudgeOutput(final_score=20, verdict="NO-GO", recommendation="Still too broad.")
+
+        result = graph.invoke({"idea": "Generic scheduling app"})
+
+        self.assertEqual(self.order.count("improve"), MAX_ITERATIONS)
+        self.assertEqual(result["iteration"], MAX_ITERATIONS)
+        self.assertEqual(result["verdict"], "NO-GO")
+
+    def test_route_after_judge(self):
+        self.assertEqual(route_after_judge({"idea": "Idea", "verdict": "GO"}), "end")
+        self.assertEqual(route_after_judge({"idea": "Idea", "verdict": "MAYBE"}), "end")
+        self.assertEqual(route_after_judge({"idea": "Idea", "verdict": "NO-GO"}), "improve")
+        self.assertEqual(
+            route_after_judge({"idea": "Idea", "verdict": "NO-GO", "iteration": MAX_ITERATIONS}),
+            "end",
+        )

@@ -13,6 +13,8 @@ class StartupState(TypedDict):
     market_analysis: NotRequired[str]
     risk_analysis: NotRequired[str]
     business_analysis: NotRequired[str]
+    improvement_notes: NotRequired[str]
+    iteration: NotRequired[int]
 
     # Produced by Judge; validated by JudgeOutput.
     final_score: NotRequired[int]
