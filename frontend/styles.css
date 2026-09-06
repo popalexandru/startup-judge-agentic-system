@@ -159,6 +159,7 @@ button:disabled {
 }
 
 .pipeline span {
+  position: relative;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel-strong);
@@ -167,6 +168,29 @@ button:disabled {
   text-align: center;
   font-size: 0.85rem;
   font-weight: 700;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.pipeline span.active {
+  border-color: var(--accent);
+  background: rgba(36, 211, 238, 0.12);
+  color: var(--text);
+  box-shadow: 0 0 0 3px rgba(36, 211, 238, 0.1);
+}
+
+.pipeline span.done {
+  border-color: rgba(84, 227, 154, 0.55);
+  color: var(--success);
+}
+
+.pipeline span.done::after {
+  content: "✓";
+  margin-left: 0.35rem;
+  color: var(--success);
 }
 
 .empty-state,

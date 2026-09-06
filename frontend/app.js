@@ -9,11 +9,47 @@ const score = document.querySelector("#score");
 const verdict = document.querySelector("#verdict");
 const recommendation = document.querySelector("#recommendation");
 const sourcesList = document.querySelector("#sources-list");
+const pipelineSteps = [...document.querySelectorAll("[data-step]")];
+const stepDelayMs = 900;
+let progressTimer = null;
 
 function setState(state) {
   emptyState.classList.toggle("hidden", state !== "empty");
   loadingState.classList.toggle("hidden", state !== "loading");
   resultCard.classList.toggle("hidden", state !== "result");
+}
+
+function resetPipeline() {
+  pipelineSteps.forEach((step) => {
+    step.classList.remove("active", "done");
+  });
+}
+
+function setActiveStep(index) {
+  pipelineSteps.forEach((step, stepIndex) => {
+    step.classList.toggle("done", stepIndex < index);
+    step.classList.toggle("active", stepIndex === index);
+  });
+}
+
+function startPipelineProgress() {
+  resetPipeline();
+  let index = 0;
+  setActiveStep(index);
+
+  progressTimer = window.setInterval(() => {
+    index = Math.min(index + 1, pipelineSteps.length - 1);
+    setActiveStep(index);
+  }, stepDelayMs);
+}
+
+function finishPipelineProgress() {
+  window.clearInterval(progressTimer);
+  progressTimer = null;
+  pipelineSteps.forEach((step) => {
+    step.classList.remove("active");
+    step.classList.add("done");
+  });
 }
 
 function setVerdict(value) {
@@ -72,6 +108,7 @@ form.addEventListener("submit", async (event) => {
   button.disabled = true;
   button.textContent = "Evaluating...";
   setState("loading");
+  startPipelineProgress();
 
   try {
     const response = await fetch("/evaluate", {
@@ -86,9 +123,13 @@ form.addEventListener("submit", async (event) => {
 
     const data = await response.json();
     renderResult(data);
+    finishPipelineProgress();
     setState("result");
   } catch (error) {
+    window.clearInterval(progressTimer);
+    progressTimer = null;
     errorMessage.textContent = error.message;
+    resetPipeline();
     setState("empty");
   } finally {
     button.disabled = false;
