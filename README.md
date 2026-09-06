@@ -17,10 +17,10 @@ flowchart LR
     user(["Startup idea"]) --> cli["CLI<br/>Rich stream"]
     user --> web["Dark web UI"]
     web --> api["FastAPI<br/>POST /evaluate"]
-    cli --> graph["LangGraph<br/>StateGraph"]
-    api --> graph
+    cli --> workflow["LangGraph<br/>StateGraph"]
+    api --> workflow
 
-    graph --> state[("StartupState")]
+    workflow --> state[("StartupState")]
     state --> market["Market Agent<br/>customers + alternatives"]
     market --> research["Research Agent<br/>Tavily web context"]
     research -. "search tool" .-> tavily[("Tavily")]
@@ -40,14 +40,14 @@ flowchart LR
     classDef entry fill:#12263a,stroke:#24d3ee,color:#eef6ff,stroke-width:2px;
     classDef agent fill:#101722,stroke:#6ef3ff,color:#eef6ff,stroke-width:1.5px;
     classDef tool fill:#261b3f,stroke:#f4c95d,color:#fff7d6,stroke-width:1.5px;
-    classDef decision fill:#2a1f16,stroke:#f4c95d,color:#fff7d6,stroke-width:2px;
-    classDef state fill:#14291f,stroke:#54e39a,color:#edfff5,stroke-width:2px;
+    classDef decisionStyle fill:#2a1f16,stroke:#f4c95d,color:#fff7d6,stroke-width:2px;
+    classDef stateStyle fill:#14291f,stroke:#54e39a,color:#edfff5,stroke-width:2px;
 
-    class user,cli,web,api,graph,result entry;
+    class user,cli,web,api,workflow,result entry;
     class market,research,risk,business,implementation,judge,improve agent;
     class tavily tool;
-    class decision decision;
-    class state state;
+    class decision decisionStyle;
+    class state stateStyle;
 ```
 
 If the Judge returns `NO-GO`, the graph can route to Improve and retry the evaluation with a refined idea. The loop is capped at three improvement attempts.
