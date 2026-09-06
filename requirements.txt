@@ -5,3 +5,4 @@ python-dotenv>=1.0,<2
 langgraph>=1.0,<2
 pydantic>=2.7.4,<3
 rich>=14.0,<15
+langchain-tavily>=0.2,<1

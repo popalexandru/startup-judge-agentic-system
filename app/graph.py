@@ -6,6 +6,7 @@ from app.agents.business import business_agent
 from app.agents.improve import improve_agent
 from app.agents.judge import judge_agent
 from app.agents.market import market_agent
+from app.agents.research import research_agent
 from app.agents.risk import risk_agent
 from app.state import StartupState
 
@@ -23,6 +24,7 @@ builder = StateGraph(StartupState)
 
 # Register functions without calling them here.
 builder.add_node("market", market_agent)
+builder.add_node("research", research_agent)
 builder.add_node("risk", risk_agent)
 builder.add_node("business", business_agent)
 builder.add_node("judge", judge_agent)
@@ -30,7 +32,8 @@ builder.add_node("improve", improve_agent)
 
 # START and END are special markers, not agents or LLM calls.
 builder.add_edge(START, "market")
-builder.add_edge("market", "risk")
+builder.add_edge("market", "research")
+builder.add_edge("research", "risk")
 builder.add_edge("risk", "business")
 builder.add_edge("business", "judge")
 builder.add_conditional_edges("judge", route_after_judge, {"improve": "improve", "end": END})

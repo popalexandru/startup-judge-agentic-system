@@ -7,7 +7,12 @@ from app.agents.business import business_agent
 class BusinessTests(unittest.TestCase):
     @patch("app.agents.business.get_llm")
     def test_partial_update_and_input_preserved(self, get_llm):
-        state = {"idea": "Idea", "market_analysis": "Market", "risk_analysis": "Risks"}
+        state = {
+            "idea": "Idea",
+            "market_analysis": "Market",
+            "research_findings": "Research",
+            "risk_analysis": "Risks",
+        }
         before = state.copy()
         get_llm.return_value.invoke.return_value = AIMessage(content="Business")
         self.assertEqual(business_agent(state), {"business_analysis": "Business"})
@@ -20,4 +25,11 @@ class BusinessTests(unittest.TestCase):
     def test_empty_response_rejected(self, get_llm):
         get_llm.return_value.invoke.return_value = AIMessage(content=" ")
         with self.assertRaisesRegex(ValueError, "empty response"):
-            business_agent({"idea": "Idea", "market_analysis": "Market", "risk_analysis": "Risks"})
+            business_agent(
+                {
+                    "idea": "Idea",
+                    "market_analysis": "Market",
+                    "research_findings": "Research",
+                    "risk_analysis": "Risks",
+                }
+            )

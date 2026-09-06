@@ -9,6 +9,7 @@ class MainTests(unittest.TestCase):
     def test_run_streamed_graph_accumulates_streamed_updates(self, graph):
         graph.stream.return_value = [
             {"market": {"market_analysis": "market result"}},
+            {"research": {"research_findings": "research result"}},
             {"risk": {"risk_analysis": "risk result"}},
             {"business": {"business_analysis": "business result"}},
             {
@@ -27,6 +28,7 @@ class MainTests(unittest.TestCase):
             {
                 "idea": "Scheduling assistant",
                 "market_analysis": "market result",
+                "research_findings": "research result",
                 "risk_analysis": "risk result",
                 "business_analysis": "business result",
                 "final_score": 70,

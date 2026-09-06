@@ -5,12 +5,12 @@ Startup Judge Agentic System is the advanced version of the Startup Judge portfo
 It starts from a clean LangGraph V1 workflow and evolves into a more realistic agentic system with streaming progress, conditional routing, bounded research loops, tool use, and eventually an API or product interface.
 
 ```text
-START -> Market -> Risk -> Business -> Judge
-                                      |   |
-                                      |   v
-                                      |  END
-                                      v
-                                   Improve -> Market
+START -> Market -> Research -> Risk -> Business -> Judge
+                                                 |   |
+                                                 |   v
+                                                 |  END
+                                                 v
+                                              Improve -> Market
 ```
 
 ## Current Baseline
@@ -18,7 +18,8 @@ START -> Market -> Risk -> Business -> Judge
 The current implementation is the V1 sequential graph:
 
 - typed workflow state with `StartupState`
-- four focused LangGraph nodes
+- five focused LangGraph nodes
+- Tavily-powered web research between Market and Risk
 - partial state updates between agents
 - structured Judge output with Pydantic
 - streamed CLI execution with `graph.stream(...)`
@@ -31,7 +32,6 @@ This baseline is intentionally simple so each advanced capability can be added a
 
 ## Planned Evolution
 
-- add a web research tool for evidence-aware analysis
 - expose the workflow through an API
 - add a lightweight frontend for portfolio demos
 - persist evaluations and previous runs
@@ -41,8 +41,9 @@ This baseline is intentionally simple so each advanced capability can be added a
 | Agent | Reads | Produces |
 | --- | --- | --- |
 | Market | `idea` | `market_analysis` |
-| Risk | `idea`, `market_analysis` | `risk_analysis` |
-| Business | `idea`, `market_analysis`, `risk_analysis` | `business_analysis` |
+| Research | `idea`, `market_analysis` | `research_findings` |
+| Risk | `idea`, `market_analysis`, `research_findings` | `risk_analysis` |
+| Business | `idea`, `market_analysis`, `research_findings`, `risk_analysis` | `business_analysis` |
 | Judge | `idea`, all analyses | `final_score`, `verdict`, `recommendation` |
 | Improve | `idea`, `recommendation`, `iteration` | `idea`, `improvement_notes`, `iteration` |
 
@@ -66,6 +67,7 @@ Add your OpenAI API key to `.env`:
 ```env
 OPENAI_API_KEY=your_api_key_here
 OPENAI_MODEL=gpt-4.1-mini
+TAVILY_API_KEY=your_tavily_api_key_here
 ```
 
 ## Run
@@ -78,6 +80,7 @@ During execution, the CLI prints each streamed graph update:
 
 ```text
 [STREAM] market -> market_analysis
+[STREAM] research -> research_findings
 [STREAM] risk -> risk_analysis
 [STREAM] business -> business_analysis
 [STREAM] judge -> final_score, verdict, recommendation

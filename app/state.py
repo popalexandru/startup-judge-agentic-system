@@ -11,6 +11,7 @@ class StartupState(TypedDict):
 
     # Initially absent; each agent adds its own result.
     market_analysis: NotRequired[str]
+    research_findings: NotRequired[str]
     risk_analysis: NotRequired[str]
     business_analysis: NotRequired[str]
     improvement_notes: NotRequired[str]

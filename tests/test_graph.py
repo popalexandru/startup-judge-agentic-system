@@ -20,6 +20,10 @@ class GraphTests(unittest.TestCase):
                 self.order.append(name)
                 return AIMessage(content=f"{name} result")
             self.clients[name].invoke.side_effect = respond
+        search_patcher = patch("app.agents.research.get_search_tool")
+        self.search_tool = search_patcher.start().return_value
+        self.addCleanup(search_patcher.stop)
+        self.search_tool.invoke.side_effect = self.research_response
         def judge_response(messages):
             self.order.append("judge")
             return self.output
@@ -30,23 +34,29 @@ class GraphTests(unittest.TestCase):
             return AIMessage(content="Improved barbershop scheduling assistant")
         self.clients["improve"].invoke.side_effect = improve_response
 
+    def research_response(self, query):
+        self.order.append("research")
+        return {"results": [{"title": "Research", "url": "https://example.com", "content": "research result"}]}
+
     def test_full_flow_transfers_results_in_order(self):
         initial = {"idea": "Barbershop scheduling assistant"}
         result = graph.invoke(initial)
-        self.assertEqual(self.order, ["market", "risk", "business", "judge"])
+        self.assertEqual(self.order, ["market", "research", "risk", "business", "judge"])
         self.assertEqual(initial, {"idea": "Barbershop scheduling assistant"})
         self.assertEqual(result, {**initial, "market_analysis": "market result",
+            "research_findings": "- Research: research result (https://example.com)",
             "risk_analysis": "risk result", "business_analysis": "business result",
             **self.output.model_dump()})
-        for name, required in (("risk", ["market"]), ("business", ["market", "risk"]),
-                               ("judge", ["market", "risk", "business"])):
+        for name, required in (("risk", ["market", "research"]), ("business", ["market", "research", "risk"]),
+                               ("judge", ["market", "research", "risk", "business"])):
             client = self.clients[name]
             invoke = client.with_structured_output.return_value.invoke if name == "judge" else client.invoke
             invoke.assert_called_once()
             prompt = invoke.call_args.args[0][-1][1]
             self.assertIn("Barbershop scheduling assistant", prompt)
             for source in required:
-                self.assertIn(f"{source} result", prompt)
+                expected = "research result" if source == "research" else f"{source} result"
+                self.assertIn(expected, prompt)
 
     def test_existing_analysis_is_replaced(self):
         result = graph.invoke({"idea": "Barbershop scheduling assistant", "market_analysis": "Old"})
@@ -83,7 +93,10 @@ class GraphTests(unittest.TestCase):
 
         self.assertEqual(
             self.order,
-            ["market", "risk", "business", "judge", "improve", "market", "risk", "business", "judge"],
+            [
+                "market", "research", "risk", "business", "judge", "improve",
+                "market", "research", "risk", "business", "judge",
+            ],
         )
         self.assertEqual(result["idea"], "Improved barbershop scheduling assistant")
         self.assertEqual(result["iteration"], 1)

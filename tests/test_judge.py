@@ -22,7 +22,7 @@ class JudgeTests(unittest.TestCase):
 
     @patch("app.agents.judge.get_llm")
     def test_returns_validated_update_without_mutation(self, get_llm):
-        state = {"idea": "Idea", "market_analysis": "Market", "risk_analysis": "Risks",
+        state = {"idea": "Idea", "market_analysis": "Market", "research_findings": "Research", "risk_analysis": "Risks",
                  "business_analysis": "Business"}
         before = state.copy()
         output = JudgeOutput(final_score=60, verdict="MAYBE", recommendation="Pilot")
@@ -37,7 +37,7 @@ class JudgeTests(unittest.TestCase):
         def invalid_response(messages):
             return JudgeOutput(final_score=101, verdict="GO", recommendation="Pilot")
         get_llm.return_value.with_structured_output.return_value.invoke.side_effect = invalid_response
-        state = {"idea": "Idea", "market_analysis": "Market", "risk_analysis": "Risks",
+        state = {"idea": "Idea", "market_analysis": "Market", "research_findings": "Research", "risk_analysis": "Risks",
                  "business_analysis": "Business"}
         before = state.copy()
         with self.assertRaises(ValidationError):
