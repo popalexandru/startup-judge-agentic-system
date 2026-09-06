@@ -20,6 +20,7 @@ The current implementation is the V1 sequential graph:
 - typed workflow state with `StartupState`
 - five focused LangGraph nodes
 - Tavily-powered web research between Market and Risk
+- visible research sources in the final CLI output
 - partial state updates between agents
 - structured Judge output with Pydantic
 - deterministic verdict mapping from score
@@ -42,7 +43,7 @@ This baseline is intentionally simple so each advanced capability can be added a
 | Agent | Reads | Produces |
 | --- | --- | --- |
 | Market | `idea` | `market_analysis` |
-| Research | `idea`, `market_analysis` | `research_findings` |
+| Research | `idea`, `market_analysis` | `research_findings`, `research_sources` |
 | Risk | `idea`, `market_analysis`, `research_findings` | `risk_analysis` |
 | Business | `idea`, `market_analysis`, `research_findings`, `risk_analysis` | `business_analysis` |
 | Judge | `idea`, all analyses | `final_score`, `verdict`, `recommendation` |
@@ -84,11 +85,15 @@ During execution, the CLI prints each streamed graph update:
 
 ```text
 [STREAM] market -> market_analysis
-[STREAM] research -> research_findings
+[STREAM] research -> research_findings, research_sources
 [STREAM] risk -> risk_analysis
 [STREAM] business -> business_analysis
 [STREAM] judge -> final_score, verdict, recommendation
 [ROUTE] MAYBE -> end
+
+Research Sources
+1. Example source title
+   https://example.com
 ```
 
 If Judge returns `NO-GO` and the loop still has attempts left, the CLI shows the retry route:

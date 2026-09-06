@@ -47,6 +47,17 @@ def run_streamed_graph(initial_state: StartupState) -> StartupState:
     return final_state
 
 
+def print_sources(state: StartupState) -> None:
+    sources = state.get("research_sources", [])
+    if not sources:
+        return
+
+    console.print("\n[bold]Research Sources[/bold]")
+    for index, source in enumerate(sources[:3], start=1):
+        console.print(f"{index}. [cyan]{source['title']}[/cyan]")
+        console.print(f"   [blue]{source['url']}[/blue]")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Startup Judge - analyses and verdict")
     parser.add_argument("idea", help="Startup idea, wrapped in quotes")
@@ -64,6 +75,7 @@ def main() -> None:
     console.print(f"[bold]Score:[/bold] {final_state['final_score']}/100")
     console.print(f"[bold]Verdict:[/bold] {final_state['verdict']}")
     console.print(f"[bold]Recommendation:[/bold] {final_state['recommendation']}")
+    print_sources(final_state)
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from langchain_tavily import TavilySearch
 
-from app.state import StartupState
+from app.state import ResearchSource, StartupState
 
 
 def get_search_tool() -> TavilySearch:
@@ -16,17 +16,27 @@ def get_search_tool() -> TavilySearch:
     return TavilySearch(max_results=3, topic="general")
 
 
-def format_results(results: dict) -> str:
+def extract_sources(results: dict) -> list[ResearchSource]:
     items = results.get("results", [])
-    if not items:
+    sources: list[ResearchSource] = []
+    for item in items:
+        sources.append(
+            {
+                "title": item.get("title", "Untitled"),
+                "url": item.get("url", ""),
+                "summary": item.get("content", ""),
+            }
+        )
+    return sources
+
+
+def format_sources(sources: list[ResearchSource]) -> str:
+    if not sources:
         return "No relevant web results found."
 
     lines = []
-    for item in items:
-        title = item.get("title", "Untitled")
-        url = item.get("url", "")
-        content = item.get("content", "")
-        lines.append(f"- {title}: {content} ({url})")
+    for source in sources:
+        lines.append(f"- {source['title']}: {source['summary']} ({source['url']})")
     return "\n".join(lines)
 
 
@@ -36,4 +46,8 @@ def research_agent(state: StartupState) -> dict[str, str]:
     query = f"market evidence competitors customer demand for: {idea}\nContext: {market}"
 
     results = get_search_tool().invoke({"query": query})
-    return {"research_findings": format_results(results)}
+    sources = extract_sources(results)
+    return {
+        "research_findings": format_sources(sources),
+        "research_sources": sources,
+    }

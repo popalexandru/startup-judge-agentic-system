@@ -1,13 +1,13 @@
 import unittest
 from unittest.mock import patch
 
-from app.agents.research import format_results, research_agent
+from app.agents.research import extract_sources, format_sources, research_agent
 
 
 class ResearchTests(unittest.TestCase):
-    def test_format_results(self):
+    def test_extract_sources(self):
         self.assertEqual(
-            format_results(
+            extract_sources(
                 {
                     "results": [
                         {
@@ -18,11 +18,19 @@ class ResearchTests(unittest.TestCase):
                     ]
                 }
             ),
+            [{"title": "Market report", "url": "https://example.com", "summary": "Useful summary."}],
+        )
+
+    def test_format_sources(self):
+        self.assertEqual(
+            format_sources(
+                [{"title": "Market report", "url": "https://example.com", "summary": "Useful summary."}]
+            ),
             "- Market report: Useful summary. (https://example.com)",
         )
 
-    def test_format_results_handles_empty_results(self):
-        self.assertEqual(format_results({"results": []}), "No relevant web results found.")
+    def test_format_sources_handles_empty_results(self):
+        self.assertEqual(format_sources([]), "No relevant web results found.")
 
     @patch("app.agents.research.get_search_tool")
     def test_research_agent_returns_findings(self, get_search_tool):
@@ -44,6 +52,16 @@ class ResearchTests(unittest.TestCase):
         )
 
         self.assertIn("Competitor", update["research_findings"])
+        self.assertEqual(
+            update["research_sources"],
+            [
+                {
+                    "title": "Competitor",
+                    "url": "https://example.com/competitor",
+                    "summary": "A competitor exists.",
+                }
+            ],
+        )
         get_search_tool.return_value.invoke.assert_called_once()
 
 

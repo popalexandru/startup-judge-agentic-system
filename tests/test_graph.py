@@ -45,6 +45,7 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(initial, {"idea": "Barbershop scheduling assistant"})
         self.assertEqual(result, {**initial, "market_analysis": "market result",
             "research_findings": "- Research: research result (https://example.com)",
+            "research_sources": [{"title": "Research", "url": "https://example.com", "summary": "research result"}],
             "risk_analysis": "risk result", "business_analysis": "business result",
             "final_score": 65, "verdict": "MAYBE", "recommendation": "Test a pilot."})
         for name, required in (("risk", ["market", "research"]), ("business", ["market", "research", "risk"]),

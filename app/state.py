@@ -5,6 +5,12 @@ from typing import Literal
 from typing_extensions import NotRequired, TypedDict
 
 
+class ResearchSource(TypedDict):
+    title: str
+    url: str
+    summary: str
+
+
 class StartupState(TypedDict):
     # Provided by the user when the workflow starts.
     idea: str
@@ -12,6 +18,7 @@ class StartupState(TypedDict):
     # Initially absent; each agent adds its own result.
     market_analysis: NotRequired[str]
     research_findings: NotRequired[str]
+    research_sources: NotRequired[list[ResearchSource]]
     risk_analysis: NotRequired[str]
     business_analysis: NotRequired[str]
     improvement_notes: NotRequired[str]
